@@ -20,13 +20,11 @@ def get_exif_data(image):
 				exif_data[decoded] = gps_data
 			else:
 				exif_data[decoded] = value
-
 	return exif_data
 
 def _get_if_exist(data, key):
 	if key in data:
 		return data[key]
-
 	return None
 
 def _convert_to_degress(value):
@@ -47,7 +45,6 @@ def _convert_to_degress(value):
 def get_lat_lon(exif_data):
 	lat = None
 	lon = None
-
 	if "GPSInfo" in exif_data:
 		gps_info = exif_data["GPSInfo"]
 
@@ -69,34 +66,47 @@ def get_lat_lon(exif_data):
 		#lon = [((99, 9), (99, 9), (9999, 999))]
 		#gps_longitude = [((99, 9), (99, 9), (9999, 999))]
 		#gps_latitude = [((99, 9), (99, 9), (9999, 999))]
-
 	return lat, lon, gps_longitude, gps_latitude
+
+def generateName(lat, lon):#This generates the string that is the geotag from the exif data from the file.
+	return (str(lat[0][0]) + "." + str(lat[1][0]) + "." + str(lat[2][0])[0:2]+ "." + str(lat[2][0])[2:4] + "N" + "-" + str(lon[0][0]) + "." + str(lon[1][0]) + "." + str(lon[2][0])[0:2] + "." + str(lon[2][0])[2:4]  + "W.JPG")
+
+
 
 def rename(name, indir, outdir):
 
+	global num_taggless
+	num_taggless = 0
 	img = Image.open(indir + "/" + name)
 	imgIn = open(indir + "/" +  name, 'r')
 	data = get_exif_data(img)
 
-
 	lon = get_lat_lon(data)[2]
 	lat = get_lat_lon(data)[3]
-	print lon
-	print lat
+	#print lon
+	#print lat
 
 	if lon != None:
-		nameOfProcFile = str(lat[0][0]) + "." + str(lat[1][0]) + "." + str(lat[2][0])[0:2]+ "." + str(lat[2][0])[2:4] + "N" + "-" + str(lon[0][0]) + "." + str(lon[1][0]) + "." + str(lon[2][0])[0:2] + "." + str(lon[2][0])[2:4]  + "W.JPG"
+		nameOfProcFile = generateName(lat, lon)
+		#nameOfProcFile = str(lat[0][0]) + "." + str(lat[1][0]) + "." + str(lat[2][0])[0:2]+ "." + str(lat[2][0])[2:4] + "N" + "-" + str(lon[0][0]) + "." + str(lon[1][0]) + "." + str(lon[2][0])[0:2] + "." + str(lon[2][0])[2:4]  + "W.JPG"
 
 	else:
+		num_taggless = num_taggless + 1
 		nameOfProcFile = "NoGPS.JPG"
 
 	copyfile(indir + "/" + name, outdir + "/" + name[0:8] + " " +nameOfProcFile)
 	imgIn.close()
 
 indir = str(input("What's the name of the directory that your unprocessed pictures are in?"))
-outdir = indir + " POST"
+outdir = "Renamed " + indir 
 if not os.path.exists(outdir): os.makedirs(outdir)
 files = os.listdir(indir)
 for elt in files:
 	print str(elt)
 	rename(str(elt), indir, outdir)
+if num_taggless == 0:
+	print "All of these photos have GPS data."
+elif num_taggless == 1:
+	print "One of the photos doesn't have GPS data."
+else:
+	print num_taggless + "photos don't have GPS data."

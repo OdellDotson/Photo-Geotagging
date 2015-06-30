@@ -109,4 +109,4 @@ if num_taggless == 0:
 elif num_taggless == 1:
 	print "One of the photos doesn't have GPS data."
 else:
-	print num_taggless + "photos don't have GPS data."
+	print num_taggless + "photos dont have GPS data."

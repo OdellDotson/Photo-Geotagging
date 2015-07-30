@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#This program is for mass modification of images. 
+
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 import os

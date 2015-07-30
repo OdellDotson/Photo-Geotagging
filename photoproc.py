@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 #This program is for mass modification of images. 
 
 from PIL import Image
@@ -8,6 +8,9 @@ import time
 from shutil import copyfile
 
 def get_exif_data(image):
+	"""
+	This function gets the exit data off of an image. Please pass it an image file with associated EXIF data.
+	"""
 	exif_data = {}
 	info = image._getexif()
 	if info:
@@ -25,12 +28,18 @@ def get_exif_data(image):
 	return exif_data
 
 def _get_if_exist(data, key):
+	"""
+	Give me (data, key) and I will return data[key] if data is in key.
+	"""
 	if key in data:
 		return data[key]
 	return None
 
 def _convert_to_degress(value):
-	d0 = value[0][0]
+	"""
+	Convert to angle asmuth or some such? I'm not actually sure how these seconds to degrees whatnot work, but the math works. Thanks Jason Weston for that.
+	"""
+	0 = value[0][0]
 	d1 = value[0][1]
 	d = float(d0) / float(d1)
 
@@ -45,6 +54,10 @@ def _convert_to_degress(value):
 	return d + (m / 60.0) + (s / 3600.0)
 
 def get_lat_lon(exif_data):
+	"""
+	If there's GPS data in exif data, this will return it in four arguments: lat, lon, gps_longitude, gps_latitude.
+	If there isn't, the return is undefined.
+	"""	
 	lat = None
 	lon = None
 	if "GPSInfo" in exif_data:
@@ -63,20 +76,20 @@ def get_lat_lon(exif_data):
 			lon = _convert_to_degress(gps_longitude)
 			if gps_longitude_ref != "E":
 				lon = 0 - lon
-	#else: # Depriciated, but keep becuase annoying to rewrite if needed later.
-		#lat = [((99, 9), (99, 9), (9999, 999))]
-		#lon = [((99, 9), (99, 9), (9999, 999))]
-		#gps_longitude = [((99, 9), (99, 9), (9999, 999))]
-		#gps_latitude = [((99, 9), (99, 9), (9999, 999))]
 	return lat, lon, gps_longitude, gps_latitude
 
-def generateName(lat, lon):#This generates the string that is the geotag from the exif data from the file.
+def generateName(lat, lon):
+	"""
+	Given a latitude and a longitude, this returns a string that is the name formatted.
+	"""
 	return (str(lat[0][0]) + "." + str(lat[1][0]) + "." + str(lat[2][0])[0:2]+ "." + str(lat[2][0])[2:4] + "N" + "-" + str(lon[0][0]) + "." + str(lon[1][0]) + "." + str(lon[2][0])[0:2] + "." + str(lon[2][0])[2:4]  + "W.JPG")
 
 
 
 def rename(name, indir, outdir):
-
+	"""
+	This function takes a file of a specific name from the input directory (indir) and writes it with the new name from generateName to the output directory (outdir).
+	"""
 	global num_taggless
 	num_taggless = 0
 	img = Image.open(indir + "/" + name)
@@ -98,6 +111,8 @@ def rename(name, indir, outdir):
 
 	copyfile(indir + "/" + name, outdir + "/" + name[0:8] + " " +nameOfProcFile)
 	imgIn.close()
+
+
 
 indir = str(input("What's the name of the directory that your unprocessed pictures are in?"))
 outdir = "Renamed " + indir 

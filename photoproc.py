@@ -21,7 +21,7 @@ def get_exif_data(image):
 				for t in value:
 					sub_decoded = GPSTAGS.get(t, t)
 					gps_data[sub_decoded] = value[t]
-
+#hehe
 				exif_data[decoded] = gps_data
 			else:
 				exif_data[decoded] = value

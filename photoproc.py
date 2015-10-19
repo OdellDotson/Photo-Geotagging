@@ -60,6 +60,9 @@ def get_lat_lon(exif_data):
 	"""	
 	lat = None
 	lon = None
+	gps_latitude = None
+	gps_latitude = None
+
 	if "GPSInfo" in exif_data:
 		gps_info = exif_data["GPSInfo"]
 
